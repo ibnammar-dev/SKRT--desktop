@@ -9,8 +9,12 @@ import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoginController {
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+    
     @FXML
     private TextField emailField;
     
@@ -34,7 +38,7 @@ public class LoginController {
     
     @FXML
     private void handleLogin() {
-        String email = emailField.getText();
+        String email = emailField.getText().trim();
         String password = passwordField.getText();
         
         if (email.isEmpty() || password.isEmpty()) {
@@ -48,16 +52,28 @@ public class LoginController {
         authService.login(email, password)
             .thenAccept(response -> Platform.runLater(() -> {
                 if (response.isSuccess()) {
-                    // TODO: Navigate to main screen
-                    System.out.println("Login successful");
+                    logger.info("Login successful for user: {}", email);
+                    // TODO: Store the token and navigate to main screen
+                    System.out.println("Login successful. Token: " + response.getData());
                 } else {
-                    errorLabel.setText(response.getMessage());
+                    String errorMessage = response.getMessage();
+                    if (response.getErrors() != null && !response.getErrors().isEmpty()) {
+                        errorMessage = response.getErrors().values().stream()
+                            .flatMap(java.util.Arrays::stream)
+                            .findFirst()
+                            .orElse(errorMessage);
+                    }
+                    errorLabel.setText(errorMessage);
+                    logger.warn("Login failed: {}", errorMessage);
                 }
             }))
             .exceptionally(throwable -> {
                 Platform.runLater(() -> {
-                    errorLabel.setText("An error occurred during login");
-                    loginButton.setDisable(false);
+                    String errorMessage = throwable.getCause() != null ? 
+                        throwable.getCause().getMessage() : 
+                        "An error occurred during login";
+                    errorLabel.setText(errorMessage);
+                    logger.error("Login error", throwable);
                 });
                 return null;
             })
