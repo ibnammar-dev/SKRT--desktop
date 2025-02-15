@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml" fx:controller="com.skrt.desktop.controllers.RegisterController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+    
+    <VBox maxWidth="400" styleClass="panel">
+        <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+        </VBox.margin>
+        
+        <Label text="Create Account" styleClass="h3"/>
+        
+        <VBox spacing="15" styleClass="panel-body">
+            <padding>
+                <Insets top="15.0"/>
+            </padding>
+            
+            <TextField fx:id="firstNameField" promptText="First Name" styleClass="form-control"/>
+            <TextField fx:id="lastNameField" promptText="Last Name" styleClass="form-control"/>
+            <TextField fx:id="emailField" promptText="Email" styleClass="form-control"/>
+            <PasswordField fx:id="passwordField" promptText="Password" styleClass="form-control"/>
+            <PasswordField fx:id="confirmPasswordField" promptText="Confirm Password" styleClass="form-control"/>
+            
+            <Button fx:id="registerButton" text="Create Account" styleClass="btn,btn-primary" onAction="#handleRegister" maxWidth="Infinity"/>
+            <Hyperlink fx:id="loginLink" text="Already have an account? Login here" onAction="#handleLogin"/>
+            <Label fx:id="errorLabel" styleClass="text-danger" wrapText="true"/>
+        </VBox>
+    </VBox>
+</VBox> 

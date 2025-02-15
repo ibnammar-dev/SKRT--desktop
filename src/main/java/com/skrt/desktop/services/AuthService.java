@@ -3,6 +3,8 @@ package com.skrt.desktop.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.skrt.desktop.config.ApiConfig;
+import com.skrt.desktop.models.requests.LoginRequest;
+import com.skrt.desktop.models.requests.RegisterRequest;
 import com.skrt.desktop.models.responses.LoginResponse;
 import com.skrt.desktop.utils.ApiResponse;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -55,6 +57,40 @@ public class AuthService {
             } catch (Exception e) {
                 logger.error("Failed to login for user: " + email, e);
                 throw new RuntimeException("Failed to login", e);
+            }
+        });
+    }
+    
+    public CompletableFuture<ApiResponse<Void>> register(String firstName, String lastName, String email, String password) {
+        logger.info("Attempting to register user: {}", email);
+        return CompletableFuture.supplyAsync(() -> {
+            try (CloseableHttpClient client = HttpClients.createDefault()) {
+                HttpPost request = new HttpPost(baseUrl + ApiConfig.AUTH_REGISTER);
+                
+                // Set headers
+                request.setHeader("Content-Type", "application/json");
+                
+                // Create request body
+                RegisterRequest registerRequest = new RegisterRequest(firstName, lastName, email, password);
+                String json = objectMapper.writeValueAsString(registerRequest);
+                StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
+                request.setEntity(entity);
+                
+                logger.debug("Sending registration request to: {}", request.getUri());
+                logger.debug("Request body: {}", json);
+                
+                return client.execute(request, response -> {
+                    String responseBody = new String(response.getEntity().getContent().readAllBytes());
+                    logger.debug("Received response: {}", responseBody);
+                    
+                    // Create type reference for proper deserialization
+                    TypeFactory typeFactory = objectMapper.getTypeFactory();
+                    return objectMapper.readValue(responseBody, 
+                        typeFactory.constructParametricType(ApiResponse.class, Void.class));
+                });
+            } catch (Exception e) {
+                logger.error("Failed to register user: " + email, e);
+                throw new RuntimeException("Failed to register", e);
             }
         });
     }

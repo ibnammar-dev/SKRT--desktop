@@ -113,7 +113,22 @@ public class LoginController {
     
     @FXML
     private void handleRegister() {
-        // TODO: Navigate to register screen
-        System.out.println("Navigate to register");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register.fxml"));
+            Parent registerView = loader.load();
+            
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            Scene scene = new Scene(registerView);
+            scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
+            
+            stage.setScene(scene);
+            stage.setTitle("SKRT Desktop - Create Account");
+            stage.centerOnScreen();
+            
+            logger.info("Navigated to registration screen");
+        } catch (IOException e) {
+            logger.error("Failed to load registration view", e);
+            errorLabel.setText("Failed to navigate to registration screen");
+        }
     }
 } 
