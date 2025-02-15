@@ -14,10 +14,12 @@ public class LoginRequest {
         this.password = password;
     }
     
+    @JsonProperty("email")
     public String getEmail() {
         return email;
     }
     
+    @JsonProperty("password")
     public String getPassword() {
         return password;
     }

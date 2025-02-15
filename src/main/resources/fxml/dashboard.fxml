@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.skrt.desktop.controllers.DashboardController">
+    <!-- Sidebar -->
+    <VBox styleClass="sidebar" prefWidth="200" spacing="10" style="-fx-background-color: #f8f9fa;">
+        <padding>
+            <Insets top="20" right="10" bottom="20" left="10"/>
+        </padding>
+        
+        <!-- User Info -->
+        <VBox styleClass="user-info" spacing="5">
+            <Label fx:id="userNameLabel" styleClass="h5"/>
+            <Label fx:id="userEmailLabel" styleClass="text-muted"/>
+        </VBox>
+        
+        <Separator/>
+        
+        <!-- Navigation -->
+        <Button text="Dashboard" styleClass="btn,btn-link" maxWidth="Infinity" onAction="#handleDashboard"/>
+        <Button text="Posts" styleClass="btn,btn-link" maxWidth="Infinity" onAction="#handlePosts"/>
+        <Button text="Profile" styleClass="btn,btn-link" maxWidth="Infinity" onAction="#handleProfile"/>
+        
+        <Region VBox.vgrow="ALWAYS"/> <!-- Spacer -->
+        
+        <Button text="Logout" styleClass="btn,btn-outline-danger" maxWidth="Infinity" onAction="#handleLogout"/>
+    </VBox>
+    
+    <!-- Main Content -->
+    <StackPane HBox.hgrow="ALWAYS" fx:id="contentArea" style="-fx-background-color: white;">
+        <padding>
+            <Insets top="20" right="20" bottom="20" left="20"/>
+        </padding>
+        
+        <!-- Welcome Message -->
+        <VBox alignment="CENTER" spacing="20">
+            <Label text="Welcome to SKRT Desktop" styleClass="h3"/>
+            <Label text="Select an option from the sidebar to get started" styleClass="text-muted"/>
+        </VBox>
+    </StackPane>
+</HBox> 

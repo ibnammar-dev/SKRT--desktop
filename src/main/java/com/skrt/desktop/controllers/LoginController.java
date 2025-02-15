@@ -1,16 +1,25 @@
 package com.skrt.desktop.controllers;
 
+import com.skrt.desktop.models.User;
+import com.skrt.desktop.models.responses.LoginResponse;
 import com.skrt.desktop.services.AuthService;
+import com.skrt.desktop.services.TokenService;
 import com.skrt.desktop.utils.ApiResponse;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -53,8 +62,30 @@ public class LoginController {
             .thenAccept(response -> Platform.runLater(() -> {
                 if (response.isSuccess()) {
                     logger.info("Login successful for user: {}", email);
-                    // TODO: Store the token and navigate to main screen
-                    System.out.println("Login successful. Token: " + response.getData());
+                    
+                    // Store token and user data
+                    LoginResponse loginData = response.getData();
+                    TokenService.getInstance().setToken(loginData.getToken());
+                    TokenService.getInstance().setCurrentUser(loginData.getUser());
+                    
+                    // Navigate to dashboard
+                    try {
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/dashboard.fxml"));
+                        Parent dashboard = loader.load();
+                        
+                        Stage stage = (Stage) loginButton.getScene().getWindow();
+                        Scene scene = new Scene(dashboard);
+                        scene.getStylesheets().add(getClass().getResource("/styles/main.css").toExternalForm());
+                        
+                        stage.setScene(scene);
+                        stage.setTitle("SKRT Desktop - Dashboard");
+                        stage.setMaximized(true);
+                        
+                        logger.info("Navigated to dashboard");
+                    } catch (IOException e) {
+                        logger.error("Failed to load dashboard", e);
+                        errorLabel.setText("Failed to load dashboard");
+                    }
                 } else {
                     String errorMessage = response.getMessage();
                     if (response.getErrors() != null && !response.getErrors().isEmpty()) {

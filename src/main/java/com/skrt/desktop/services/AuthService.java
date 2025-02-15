@@ -3,8 +3,7 @@ package com.skrt.desktop.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.skrt.desktop.config.ApiConfig;
-import com.skrt.desktop.models.User;
-import com.skrt.desktop.models.requests.LoginRequest;
+import com.skrt.desktop.models.responses.LoginResponse;
 import com.skrt.desktop.utils.ApiResponse;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -27,7 +26,7 @@ public class AuthService {
         logger.info("AuthService initialized with base URL: {}", baseUrl);
     }
     
-    public CompletableFuture<ApiResponse<User>> login(String email, String password) {
+    public CompletableFuture<ApiResponse<LoginResponse>> login(String email, String password) {
         logger.info("Attempting login for user: {}", email);
         return CompletableFuture.supplyAsync(() -> {
             try (CloseableHttpClient client = HttpClients.createDefault()) {
@@ -51,12 +50,30 @@ public class AuthService {
                     // Create type reference for proper deserialization
                     TypeFactory typeFactory = objectMapper.getTypeFactory();
                     return objectMapper.readValue(responseBody, 
-                        typeFactory.constructParametricType(ApiResponse.class, User.class));
+                        typeFactory.constructParametricType(ApiResponse.class, LoginResponse.class));
                 });
             } catch (Exception e) {
                 logger.error("Failed to login for user: " + email, e);
                 throw new RuntimeException("Failed to login", e);
             }
         });
+    }
+    
+    private static class LoginRequest {
+        private final String email;
+        private final String password;
+        
+        public LoginRequest(String email, String password) {
+            this.email = email;
+            this.password = password;
+        }
+        
+        public String getEmail() {
+            return email;
+        }
+        
+        public String getPassword() {
+            return password;
+        }
     }
 } 
